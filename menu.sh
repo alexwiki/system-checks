@@ -8,11 +8,11 @@
     #script -a my_draft_db.txt           Den douleuei h mlkia ... #We keep the -a argument in order to append to the same file and NOT to delete it's history.
     
     #trying to figure out if the client wrote his name.  example: ./menu.sh Alex 
-    if [ -z "$1"];
+    if [ -z "$1" ];
     then
         echo " Hello $1"
 
-    elif [ -n "$1"];
+    elif [ -n "$1" ];
     then
         $1="Boiiii!"
         echo $1
@@ -21,20 +21,20 @@
     
     echo "Bonjour! Please choose what would you like to know today about this system. 1 for system_status, 2 for who is logged in currently, 3 for checking updates, 4 for service ops, 5 for storage options"
     read user_input
-sadf
-    if ["$user_input"=1]; 
+
+    if [ $user_input -eq 1 ]; 
     then
     system_status
-    elif ["$user_input"=2];
+    elif [ $user_input -eq 2 ];
     then
     who_is_in
-    elif ["$user_input"=3];
+    elif [ $user_input -eq 3 ];
     then
     update_system
-    elif ["$user_input"=4];
+    elif [ $user_input -eq 4 ];
     then
     service_check
-    elif ["$user_input"=5];
+    elif [ $user_input -eq 5 ];
     then
     storage_check
     fi
@@ -76,14 +76,24 @@ who_is_in()         #OPTION 2
 
 update_system()     #OPTION 3
 {
-    echo "Checking System Updates..."
+    echo "Checking System Updates...\n Please enter 1 for Debian based (aptitude) and 2 for Redhat based distro (yum)"
+    read distro
 
-    sudo apt update                  #checks any updates and goes forward to update the software.
+    if [ $distro -eq 1 ];
+    then   
+        sudo apt update                  #checks any updates and goes forward to update the software.
 
-    sudo apt-get dist-upgrade       #checks and moves forward if you want to upgrade your system.
+        sudo apt-get dist-upgrade       #checks and moves forward if you want to upgrade your system.
 
-    sudo apt upgrade kernel         #checks and moves forward if you want to upgrade the kernel.
+        sudo apt upgrade kernel         #checks and moves forward if you want to upgrade the kernel.
+    elif [ $distro -eq 2 ];
+    then
+        sudo yum update
 
+        sudo yum upgrade
+
+        sudo yum upgrade kernel
+    fi
 }
 
 service_check()      #OPTION 4
