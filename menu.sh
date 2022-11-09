@@ -104,25 +104,23 @@ service_check()      #OPTION 4
 
     sudo service $service Status
 
-    echo "What to do with the service? 1: Restart, 2: Stop, 3: Enable, 4: Disable, 5: start"
+    echo "What to do with the service? 1: Restart, 2: Stop,  3: start, 4: status"
     read service_choice
-    if [service_choice== 1];
+    if [ $service_choice -eq 1 ];
     then 
     sudo service $service restart
     
-    elif [service_choice== 2];
+    elif [ $service_choice -eq 2 ];
     then
     sudo service $service stop
     
-    elif [service_choice== 3];
-    then
-    sudo service $service enable
-    elif [service_choice== 4];
-    then
-    sudo service $service disable
-    elif [service_choice== 5];
+    elif [ $service_choice -eq 3 ];
     then
     sudo service $service start
+    
+    elif [ $service_choice -eq 4 ];
+    then
+    sudo service $service status 
     fi
 
 
