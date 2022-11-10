@@ -5,21 +5,8 @@
 ###        ADD exit codes and fixes
  main()
 {
-    $log_file= date "+%Y%m%d%H%M%S.json"
-    touch $log_file
-    echo "TEST " >> $log_file
-    #trying to figure out if the user wrote his name.  example: ./menu.sh Alex 
-    if [ -z $1 ];
-    then
-        echo " Hello $1"
-
-    elif [ -n "$1" ];
-    then
-        $1="Boiiii!"
-        echo $1
-    fi
-    
-    echo "Bonjour! Please choose what would you like to know today about this system. 1 for system_status, 2 for who is logged in currently, 3 for checking updates, 4 for service ops, 5 for storage options"
+    touch history.log
+    echo "Bonjour ! Please choose what would you like to know today about this system. 1 for system_status, 2 for who is logged in currently, 3 for checking updates, 4 for service ops, 5 for storage options"
     read user_input
 
     if [ $user_input -eq 1 ]; 
@@ -45,81 +32,81 @@ system_status()     #OPTION 1
 {
     echo "Running System Status Checks..."
 
-    uptime  |tee -a "$log_file"                       #check load average.
+    uptime  |tee -a history.log                      #check load average.
 
-    mpstat |tee -a $log_file                          #check CPU  utilization & 
-    free -h  |tee -a $log_file                        # check memory in a more human readable way.
+    mpstat |tee -a history.log                          #check CPU  utilization & 
+    free -h  |tee -a history.log                        # check memory in a more human readable way.
 
-    netstat |grep "systemd" |tee -a $log_file         #Finding the network traffic of systemd
-    df -h                   |tee -a $log_file         #Checking disk utilization
+    netstat |grep "systemd" |tee -a history.log         #Finding the network traffic of systemd
+    df -h                   |tee -a history.log         #Checking disk utilization
    
 }
 
 who_is_in()         #OPTION 2
 {
 
-    echo "Checking who is logged in currently" |tee -a $log_file
+    echo "Checking who is logged in currently" |tee -a history.log
 
-    w      |tee -a $log_file  #check who is in and what is he/she running.
+    w      |tee -a history.log  #check who is in and what is he/she running.
 
-    who -w |tee -a $log_file  #a more detailed aspect along with who is logged in  and how many times and what is he running.
-    ps au  |tee -a $log_file #check who is in and what are they running (equivelant to top command.)
+    who -w |tee -a history.log  #a more detailed aspect along with who is logged in  and how many times and what is he running.
+    ps au  |tee -a history.log #check who is in and what are they running (equivelant to top command.)
 
 
-    ps -e -o pcpu,pid,user,args|sort -k1 -nr|head -10 |tee -a $log_file #show top 10 CPU usage processes with user
-    ps -e -o pmem,pid,user,args|sort -k1 -nr|head -10 |tee -a $log_file #show top 10 memory consuming processes with user.
+    ps -e -o pcpu,pid,user,args|sort -k1 -nr|head -10 |tee -a history.log #show top 10 CPU usage processes with user
+    ps -e -o pmem,pid,user,args|sort -k1 -nr|head -10 |tee -a history.log #show top 10 memory consuming processes with user.
 
-    iotop -u root -t -o -n 3                          |tee -a $log_file #we can have a lot of variations in iotop args. -t -> w timestamp, -o who actually uses the disk, -n number of iterations.
+    iotop -u root -t -o -n 3                          |tee -a history.log #we can have a lot of variations in iotop args. -t -> w timestamp, -o who actually uses the disk, -n number of iterations.
 
 }
 
 update_system()     #OPTION 3
 {
-    echo "Checking System Updates...\n Please enter 1 for Debian based (aptitude) and 2 for Redhat based distro (yum)" |tee -a $log_file
+    echo "Checking System Updates...\n Please enter 1 for Debian based (aptitude) and 2 for Redhat based distro (yum)" |tee -a history.log
     read distro
 
     if [ $distro -eq 1 ];
     then   
-        sudo apt update             |tee -a $log_file                #checks any updates and goes forward to update the software.
+        sudo apt update             |tee -a history.log                #checks any updates and goes forward to update the software.
 
-        sudo apt-get dist-upgrade   |tee -a $log_file      #checks and moves forward if you want to upgrade your system.
+        sudo apt-get dist-upgrade   |tee -a history.log      #checks and moves forward if you want to upgrade your system.
 
-        sudo apt upgrade kernel     |tee -a $log_file        #checks and moves forward if you want to upgrade the kernel.
+        sudo apt upgrade kernel     |tee -a history.log        #checks and moves forward if you want to upgrade the kernel.
     elif [ $distro -eq 2 ];
     then
-        sudo yum update             |tee -a $log_file
+        sudo yum update             |tee -a history.log
 
-        sudo yum upgrade            |tee -a $log_file
+        sudo yum upgrade            |tee -a history.log
 
-        sudo yum upgrade kernel     |tee -a $log_file
+        sudo yum upgrade kernel     |tee -a history.log
     fi
 }
 
 service_check()      #OPTION 4
 {  
-    echo "Write the service's name to be checked."  |tee -a $log_file
+    echo "Write the service's name to be checked."  |tee -a history.log
     read service
-    echo "Checking Services..."                     |tee -a $log_file
+    echo "Checking Services..."                     |tee -a history.log
 
     sudo service $service Status
 
-    echo "What to do with the service? 1: Restart, 2: Stop,  3: start, 4: status"   |tee -a $log_file
+    echo "What to do with the service? 1: Restart, 2: Stop,  3: start, 4: status"   |tee -a history.log
     read service_choice
     if [ $service_choice -eq 1 ];
     then 
-    sudo service $service restart   |tee -a $log_file
+    sudo service $service restart   |tee -a history.log
     
     elif [ $service_choice -eq 2 ];
     then
-    sudo service $service stop      |tee -a $log_file
+    sudo service $service stop      |tee -a history.log
     
     elif [ $service_choice -eq 3 ];
     then
-    sudo service $service start     |tee -a $log_file
+    sudo service $service start     |tee -a history.log
     
     elif [ $service_choice -eq 4 ];
     then
-    sudo service $service status    |tee -a $log_file
+    sudo service $service status    |tee -a history.log
     fi
 
 
@@ -127,22 +114,22 @@ service_check()      #OPTION 4
 
 storage_check()     #OPTION 5
 {
-    echo "Checking Storage..."                             |tee -a $log_file
+    echo "Checking Storage..."                             |tee -a history.log
 
-    echo "Listing All partitions and mountpoints..."       |tee -a $log_file
+    echo "Listing All partitions and mountpoints..."       |tee -a history.log
     lsblk
-    echo "Listing All partitions in an alternative way..." |tee -a $log_file
-    sudo fdisk -l                                          |tee -a $log_file
-    echo "Checking partitions labeled by UUIDS"            |tee -a $log_file
-    blkid |grep UUID                                       |tee -a $log_file     #alternative way: grep UUID /etc/fstab
+    echo "Listing All partitions in an alternative way..." |tee -a history.log
+    sudo fdisk -l                                          |tee -a history.log
+    echo "Checking partitions labeled by UUIDS"            |tee -a history.log
+    blkid |grep UUID                                       |tee -a history.log     #alternative way: grep UUID /etc/fstab
 
-    echo "Checking disk used by user..."                   |tee -a $log_file
+    echo "Checking disk used by user..."                   |tee -a history.log
 
-    du -h /home                                            |tee -a $log_file
-    echo "specify the username:"                           |tee -a $log_file
+    du -h /home                                            |tee -a history.log
+    echo "specify the username:"                           |tee -a history.log
     read username
 
-    du -h /home/$username                                  |tee -a $log_file
+    du -h /home/$username                                  |tee -a history.log
 
 
 
